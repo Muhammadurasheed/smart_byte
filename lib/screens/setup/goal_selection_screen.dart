@@ -40,6 +40,43 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
     },
   ];
 
+  void _handleStartJourney() {
+    if (_selectedGoal.isEmpty) return;
+    
+    try {
+      // Update user provider with selected goal
+      context.read<UserProvider>().updateUserInfo(goal: _selectedGoal);
+      context.read<UserProvider>().completeSetup();
+      
+      // Navigate to home dashboard with fade transition
+      Navigator.pushAndRemoveUntil(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const HomeDashboard(),
+          transitionDuration: const Duration(milliseconds: 300),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+        (route) => false,
+      );
+    } catch (e) {
+      // Handle any errors during navigation or provider updates
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Something went wrong. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,6 +171,17 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                                         ),
                                       );
                                     },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: AppColors.divider,
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.image_not_supported,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                                 
@@ -224,24 +272,10 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
             
             const SizedBox(height: AppSizes.paddingL),
             
+            // Fixed GradientButton block
             GradientButton(
               text: 'Start My Journey',
-              onPressed: _selectedGoal.isNotEmpty ? () {
-                context.read<UserProvider>().updateUserInfo(goal: _selectedGoal);
-                context.read<UserProvider>().completeSetup();
-                
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const HomeDashboard(),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                  ),
-                  (route) => false,
-                );
-              } : null,
+              onPressed: _selectedGoal.isNotEmpty ? _handleStartJourney : () {},
             ),
           ],
         ),

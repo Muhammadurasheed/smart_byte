@@ -6,6 +6,7 @@ import '../../utils/app_theme.dart';
 import '../../widgets/navigation_wrapper.dart';
 import '../../widgets/gradient_button.dart';
 import '../../providers/meal_provider.dart';
+import '../home/home_dashboard.dart';
 
 class MealLoggingScreen extends StatefulWidget {
   const MealLoggingScreen({super.key});
@@ -638,10 +639,12 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
     // Navigate back to home
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const NavigationWrapper(
-        currentIndex: 0,
-        child: HomeDashboard(),
-      )),
+      MaterialPageRoute(
+        builder: (context) => NavigationWrapper(
+          currentIndex: 0,
+          child: HomeDashboard(),
+        ),
+      ),
     );
   }
 }
