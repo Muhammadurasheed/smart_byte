@@ -11,7 +11,7 @@ class Meal {
   final double fat;
   final double fiber;
   final double portionSize;
-  final int eatingDuration;
+  final double eatingDuration;
   final double eatingSpeed;
 
   Meal({
@@ -43,7 +43,7 @@ class MealProvider with ChangeNotifier {
       fat: 18,
       fiber: 8,
       portionSize: 320,
-      eatingDuration: 12,
+      eatingDuration: 12.0,
       eatingSpeed: 26.7,
     ),
     Meal(
@@ -57,7 +57,7 @@ class MealProvider with ChangeNotifier {
       fat: 12,
       fiber: 12,
       portionSize: 280,
-      eatingDuration: 15,
+      eatingDuration: 15.0,
       eatingSpeed: 18.7,
     ),
   ];

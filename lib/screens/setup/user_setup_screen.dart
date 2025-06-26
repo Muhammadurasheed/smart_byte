@@ -269,6 +269,11 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
           onChanged: (_) => _updateProgress(),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: AppColors.primary),
+            hintText: _getHintText(label),
+            hintStyle: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.textLight,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSizes.radiusM),
               borderSide: const BorderSide(color: AppColors.divider),
@@ -287,6 +292,21 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
         ),
       ],
     );
+  }
+
+  String _getHintText(String label) {
+    switch (label) {
+      case 'Full Name':
+        return 'Enter your full name';
+      case 'Age':
+        return 'Age (13-120 years)';
+      case 'Height (cm)':
+        return 'Height in cm (100-250)';
+      case 'Weight (kg)':
+        return 'Weight in kg (30-300)';
+      default:
+        return '';
+    }
   }
 
   Widget _buildGenderOption(String gender, IconData icon) {

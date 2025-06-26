@@ -271,15 +271,17 @@ class HomeDashboard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(
+                  Expanded(
+                    child: Text(
                     "Today's Overview",
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
+                    ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: AppSizes.paddingS),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -289,29 +291,31 @@ class HomeDashboard extends StatelessWidget {
                         ),
                       );
                     },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.paddingM,
-                        vertical: AppSizes.paddingS,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: AppColors.secondaryGradient,
-                        borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.add, color: Colors.white, size: 16),
-                          const SizedBox(width: AppSizes.paddingXS),
-                          Text(
-                            'Log Meal',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                    child: Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.paddingS,
+                          vertical: AppSizes.paddingXS,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: AppColors.secondaryGradient,
+                          borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.add, color: Colors.white, size: 14),
+                            const SizedBox(width: AppSizes.paddingXS),
+                            Text(
+                              'Log',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -442,20 +446,44 @@ class HomeDashboard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(AppSizes.radiusS),
-            child: Image.network(
-              meal.imageUrl,
+            child: Container(
               width: 60,
               height: 60,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Container(
-                  width: 60,
-                  height: 60,
-                  color: AppColors.divider,
-                  child: const Center(child: CircularProgressIndicator()),
-                );
-              },
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(AppSizes.radiusS),
+              ),
+              child: Image.network(
+                meal.imageUrl,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    width: 60,
+                    height: 60,
+                    color: AppColors.divider,
+                    child: Icon(
+                      Icons.restaurant_menu,
+                      color: AppColors.textLight,
+                      size: 24,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 60,
+                    height: 60,
+                    color: AppColors.divider,
+                    child: Icon(
+                      Icons.restaurant_menu,
+                      color: AppColors.textLight,
+                      size: 24,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(width: AppSizes.paddingM),
