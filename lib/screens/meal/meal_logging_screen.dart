@@ -269,37 +269,501 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
         borderRadius: BorderRadius.circular(AppSizes.radiusL),
         child: Stack(
           children: [
-            // Placeholder image since we can't display actual file path
+            // Display actual selected image or placeholder
             Container(
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                image: const DecorationImage(
-                  image: NetworkImage('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800'),
-                  fit: BoxFit.cover,
-                  onError: null,
+              ),
+              child: _selectedImagePath != null
+                  ? Image.network(
+                      // In a real app, you'd use File(_selectedImagePath!), but for demo we'll use a placeholder
+                      'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: AppColors.divider,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image,
+                                color: AppColors.textLight,
+                                size: 48,
+                              ),
+                              const SizedBox(height: AppSizes.paddingS),
+                              Text(
+                                'Selected Image',
+                                style: GoogleFonts.inter(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: AppColors.divider,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                                const SizedBox(height: AppSizes.paddingS),
+                                Text(
+                                  'Loading image...',
+                                  style: GoogleFonts.inter(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: AppColors.divider,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            color: AppColors.textLight,
+                            size: 48,
+                          ),
+                          const SizedBox(height: AppSizes.paddingS),
+                          Text(
+                            'No image selected',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+            // Selected image indicator overlay
+            if (_selectedImagePath != null)
+              Positioned(
+                bottom: AppSizes.paddingM,
+                left: AppSizes.paddingM,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.paddingS,
+                    vertical: AppSizes.paddingXS,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: AppColors.success,
+                        size: 16,
+                      ),
+                      const SizedBox(width: AppSizes.paddingXS),
+                      Text(
+                        'Image Selected',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Image.network(
-                'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: AppColors.divider,
-                    child: Icon(
-                      Icons.image,
-                      color: AppColors.textLight,
-                      size: 48,
-                    ),
-                  );
+            // Close button
+            Positioned(
+              top: AppSizes.paddingM,
+              right: AppSizes.paddingM,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedImagePath = null;
+                    _analysisResult = null;
+                    _isAnalyzing = false;
+                  });
                 },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
+                child: Container(
+                  padding: const EdgeInsets.all(AppSizes.paddingS),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnalyzing() {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingXL),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSizes.radiusL),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          ),
+          const SizedBox(height: AppSizes.paddingL),
+          Text(
+            'Analyzing your meal...',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppSizes.paddingS),
+          Text(
+            'Our AI is identifying ingredients and calculating nutrition',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnalysisResults() {
+    final result = _analysisResult!;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSizes.paddingL),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppSizes.radiusL),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      result['name'],
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.paddingS,
+                      vertical: AppSizes.paddingXS,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.success.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                    ),
+                    child: Text(
+                      '${(result['confidence'] * 100).toInt()}% confident',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSizes.paddingL),
+              
+              // Nutrition info
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildNutritionCard(
+                      'Calories',
+                      '${result['calories'].round()}',
+                      'kcal',
+                      AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.paddingM),
+                  Expanded(
+                    child: _buildNutritionCard(
+                      'Portion',
+                      '${result['portionSize'].round()}',
+                      'g',
+                      AppColors.secondary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSizes.paddingM),
+              
+              // Macros
+              Container(
+                padding: const EdgeInsets.all(AppSizes.paddingM),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(AppSizes.radiusM),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Macronutrients',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.paddingM),
+                    Row(
+                      children: [
+                        Expanded(child: _buildMacroBar('Carbs', result['carbs'], 60, AppColors.warning)),
+                        const SizedBox(width: AppSizes.paddingS),
+                        Expanded(child: _buildMacroBar('Protein', result['protein'], 50, AppColors.primary)),
+                        const SizedBox(width: AppSizes.paddingS),
+                        Expanded(child: _buildMacroBar('Fat', result['fat'], 30, AppColors.secondary)),
+                        const SizedBox(width: AppSizes.paddingS),
+                        Expanded(child: _buildMacroBar('Fiber', result['fiber'], 15, AppColors.success)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSizes.paddingL),
+        
+        // Serving size adjustment
+        Container(
+          padding: const EdgeInsets.all(AppSizes.paddingL),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppSizes.radiusL),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Adjust Serving Size',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: AppSizes.paddingM),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.remove_circle_outline),
+                    color: AppColors.primary,
+                  ),
+                  Expanded(
+                    child: Text(
+                      '1.0 serving',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add_circle_outline),
+                    color: AppColors.primary,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNutritionCard(String label, String value, String unit, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingM),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppSizes.radiusM),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: AppSizes.paddingXS),
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: value,
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                TextSpan(
+                  text: ' $unit',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: color.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMacroBar(String label, dynamic value, double max, Color color) {
+    // Convert value to double safely
+    final double doubleValue = (value is int) ? value.toDouble() : value as double;
+    final percentage = (doubleValue / max).clamp(0.0, 1.0);
+    
+    return Column(
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: AppSizes.paddingXS),
+        Container(
+          height: 6,
+          decoration: BoxDecoration(
+            color: AppColors.divider,
+            borderRadius: BorderRadius.circular(3),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: percentage,
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSizes.paddingXS),
+        Text(
+          '${doubleValue.round()}g',
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _saveMeal() {
+    if (_analysisResult == null) return;
+    
+    final result = _analysisResult!;
+    final newMeal = Meal(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: result['name'],
+      imageUrl: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
+      timestamp: DateTime.now(),
+      calories: result['calories'] as double,
+      carbs: result['carbs'] as double,
+      protein: result['protein'] as double,
+      fat: result['fat'] as double,
+      fiber: result['fiber'] as double,
+      portionSize: result['portionSize'] as double,
+      eatingDuration: (10.0 + (DateTime.now().millisecond % 15)),
+      eatingSpeed: (15.0 + (DateTime.now().millisecond % 20)),
+    );
+    
+    context.read<MealProvider>().addMeal(newMeal);
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Meal logged successfully!'),
+        backgroundColor: AppColors.success,
+      ),
+    );
+    
                   return Container(
                     width: double.infinity,
                     height: double.infinity,
@@ -681,14 +1145,13 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
       ),
     );
     
-    // Navigate back to home
+    // Navigate back to home dashboard without duplicating navigation
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    // Then navigate to home with proper navigation wrapper
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => NavigationWrapper(
-          currentIndex: 0,
-          child: HomeDashboard(),
-        ),
+        builder: (context) => const HomeDashboard(),
       ),
     );
   }
