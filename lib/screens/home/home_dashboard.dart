@@ -170,25 +170,7 @@ class HomeDashboard extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.paddingS,
-                  vertical: AppSizes.paddingXS,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusS),
-                ),
-                child: Text(
-                  'Live',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+             
             ],
           ),
           const SizedBox(height: AppSizes.paddingL),
@@ -307,7 +289,7 @@ class HomeDashboard extends StatelessWidget {
                             const Icon(Icons.add, color: Colors.white, size: 14),
                             const SizedBox(width: AppSizes.paddingXS),
                             Text(
-                              'Log',
+                              'Log Meal',
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
