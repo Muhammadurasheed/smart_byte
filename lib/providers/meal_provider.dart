@@ -28,6 +28,32 @@ class Meal {
     required this.eatingDuration,
     required this.eatingSpeed,
   });
+
+  // Factory constructor to handle type conversion
+  factory Meal.fromMap(Map<String, dynamic> map) {
+    return Meal(
+      id: map['id']?.toString() ?? '',
+      name: map['name']?.toString() ?? '',
+      imageUrl: map['imageUrl']?.toString() ?? '',
+      timestamp: map['timestamp'] ?? DateTime.now(),
+      calories: _toDouble(map['calories']),
+      carbs: _toDouble(map['carbs']),
+      protein: _toDouble(map['protein']),
+      fat: _toDouble(map['fat']),
+      fiber: _toDouble(map['fiber']),
+      portionSize: _toDouble(map['portionSize']),
+      eatingDuration: _toDouble(map['eatingDuration']),
+      eatingSpeed: _toDouble(map['eatingSpeed']),
+    );
+  }
+
+  static double _toDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
 }
 
 class MealProvider with ChangeNotifier {

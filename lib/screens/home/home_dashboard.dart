@@ -309,7 +309,7 @@ class HomeDashboard extends StatelessWidget {
                   Expanded(
                     child: _buildOverviewMetric(
                       'Calories',
-                      '${mealProvider.todayCalories.toInt()}',
+                      '${mealProvider.todayCalories.round()}',
                       '/ 2000',
                       AppColors.primary,
                     ),
@@ -356,7 +356,7 @@ class HomeDashboard extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: target,
+                '${meal.calories.round()} cal • ${meal.portionSize.round()}g',
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: AppColors.textLight,
@@ -504,7 +504,7 @@ class HomeDashboard extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSizes.radiusS),
             ),
             child: Text(
-              '${meal.eatingSpeed.toInt()} g/min',
+              '${meal.eatingSpeed.round()} g/min',
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,

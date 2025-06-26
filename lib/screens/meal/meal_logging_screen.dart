@@ -443,7 +443,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
                   Expanded(
                     child: _buildNutritionCard(
                       'Calories',
-                      '${result['calories']}',
+                      '${result['calories'].round()}',
                       'kcal',
                       AppColors.primary,
                     ),
@@ -452,7 +452,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
                   Expanded(
                     child: _buildNutritionCard(
                       'Portion',
-                      '${result['portionSize']}',
+                      '${result['portionSize'].round()}',
                       'g',
                       AppColors.secondary,
                     ),
