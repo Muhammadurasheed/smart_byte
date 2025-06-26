@@ -75,12 +75,12 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
         _isAnalyzing = false;
         _analysisResult = {
           'name': 'Grilled Chicken Bowl',
-          'calories': 385,
-          'carbs': 22,
-          'protein': 32,
-          'fat': 16,
-          'fiber': 8,
-          'portionSize': 290,
+          'calories': 385.0, // Changed to double
+          'carbs': 22.0, // Changed to double
+          'protein': 32.0, // Changed to double
+          'fat': 16.0, // Changed to double
+          'fiber': 8.0, // Changed to double
+          'portionSize': 290.0, // Changed to double
           'confidence': 0.89,
         };
       });
@@ -195,10 +195,13 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
             Row(
               children: [
                 Expanded(
-                  child: GradientButton(
-                    text: 'Take Photo',
-                    icon: Icons.camera_alt,
-                    onPressed: () => _pickImage(ImageSource.camera),
+                  child: Container(
+                    height: 56,
+                    child: GradientButton(
+                      text: 'Take Photo',
+                      icon: Icons.camera_alt,
+                      onPressed: () => _pickImage(ImageSource.camera),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSizes.paddingM),
@@ -215,18 +218,23 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
                         borderRadius: BorderRadius.circular(AppSizes.radiusM),
                         onTap: () => _pickImage(ImageSource.gallery),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingL),
+                          padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingM),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.photo_library, color: AppColors.primary, size: 20),
+                              const Icon(Icons.photo_library, color: AppColors.primary, size: 18),
                               const SizedBox(width: AppSizes.paddingS),
-                              Text(
-                                'Gallery',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primary,
+                              Flexible(
+                                child: Text(
+                                  'Gallery',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ),
                               ),
                             ],
@@ -653,14 +661,15 @@ class _MealLoggingScreenState extends State<MealLoggingScreen>
       name: result['name'],
       imageUrl: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
       timestamp: DateTime.now(),
-      calories: result['calories'].toDouble(),
-      carbs: result['carbs'].toDouble(),
-      protein: result['protein'].toDouble(),
-      fat: result['fat'].toDouble(),
-      fiber: result['fiber'].toDouble(),
-      portionSize: result['portionSize'].toDouble(),
-      eatingDuration: 10 + (DateTime.now().millisecond % 15),
-      eatingSpeed: 15.0 + (DateTime.now().millisecond % 20),
+      calories: result['calories'] as double,
+      carbs: result['carbs'] as double,
+      protein: result['protein'] as double,
+      fat: result['fat'] as double,
+      fiber: result['fiber'] as double,
+      portionSize: result['portionSize'] as double,
+      // Fixed: Explicitly cast to double to avoid type errors
+      eatingDuration: (10.0 + (DateTime.now().millisecond % 15)),
+      eatingSpeed: (15.0 + (DateTime.now().millisecond % 20)),
     );
     
     context.read<MealProvider>().addMeal(newMeal);

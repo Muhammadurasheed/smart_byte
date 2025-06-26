@@ -356,7 +356,7 @@ class HomeDashboard extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                '${meal.calories.round()} cal • ${meal.portionSize.round()}g',
+                text: target,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: AppColors.textLight,
