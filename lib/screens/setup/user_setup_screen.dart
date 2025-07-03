@@ -161,17 +161,17 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
               
               // Daily Calorie Limit field
               _buildInputField(
-                label: 'Daily Calorie Limit',
+                label: 'Maximum Unit',
                 controller: _maxCalorieController,
                 icon: Icons.local_fire_department,
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your daily calorie limit';
+                    return 'Please enter your max unit';
                   }
                   final maxCalorie = double.tryParse(value);
-                  if (maxCalorie == null || maxCalorie < 500 || maxCalorie > 5000) {
-                    return 'Enter a valid calorie limit (500-5000)';
+                  if (maxCalorie == null || maxCalorie < 0 || maxCalorie > 50) {
+                    return 'Enter a valid max unit (0-50)';
                   }
                   return null;
                 },
@@ -261,7 +261,7 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
                     );
                   } else if (_maxCalorieController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter your daily calorie limit')),
+                      const SnackBar(content: Text('Please enter your maximum unit')),
                     );
                   }
                 },
@@ -329,13 +329,13 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
       case 'Full Name':
         return 'Enter your full name';
       case 'Age':
-        return 'Age (13-120 years)';
+        return '(13-120 years)';
       case 'Height (cm)':
-        return 'Height in cm (100-250)';
+        return '(100-250)';
       case 'Weight (kg)':
-        return 'Weight in kg (30-300)';
-      case 'Daily Calorie Limit':
-        return 'Daily calorie limit (500-5000)';
+        return '(30-300)';
+      case 'Maximum Unit':
+        return 'Maximum Unit (0-50)g';
       default:
         return '';
     }

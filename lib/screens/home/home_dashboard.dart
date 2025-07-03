@@ -269,9 +269,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 children: [
                   Expanded(
                     child: _buildSpoonMetric(
-                      'Calorie', 
+                      'Unit', 
                       '${hardwareData.calorie.toInt()}',
-                      'kcal',
+                      'g',
                       Icons.local_fire_department,
                       isConnected,
                     ),
@@ -279,9 +279,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   const SizedBox(width: AppSizes.paddingM),
                   Expanded(
                     child: _buildSpoonMetric(
-                      'Calorie/min', 
+                      'Bite/min', 
                       hardwareData.eatingSpeed.toStringAsFixed(1),
-                      'cal/min',
+                      'bite/min',
                       Icons.speed,
                       isConnected,
                     ),
@@ -293,7 +293,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 children: [
                   Expanded(
                     child: _buildSpoonMetric(
-                      'Meal Duration', 
+                      'Run time', 
                       '${hardwareData.mealDuration.toInt()}',
                       'min',
                       Icons.timer,
@@ -303,11 +303,11 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   const SizedBox(width: AppSizes.paddingM),
                   Expanded(
                     child: _buildSpoonMetric(
-                      'Max Calorie', 
+                      'Max Unit', 
                       userProvider.maxCalorie > 0 
                           ? '${userProvider.maxCalorie.toInt()}'
                           : '0',
-                      'kcal',
+                      'g',
                       Icons.flag,
                       true, // Always show this as it's user data
                     ),

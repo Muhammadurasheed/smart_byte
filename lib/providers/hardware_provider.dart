@@ -1,3 +1,4 @@
+import 'dart:async'; // Add this import for Timer
 import 'package:flutter/material.dart';
 import '../services/hardware_service.dart';
 
@@ -6,19 +7,31 @@ class HardwareProvider with ChangeNotifier {
   bool _isConnected = false;
   bool _isLoading = false;
   String? _lastError;
+  Timer? _pollingTimer; // Timer for periodic polling
 
   HardwareData get hardwareData => _hardwareData;
   bool get isConnected => _isConnected;
   bool get isLoading => _isLoading;
   String? get lastError => _lastError;
 
-  // Initialize hardware connection and fetch initial data
+  // Initialize hardware connection and start polling
   Future<void> initialize() async {
     await checkConnectionAndFetchData();
+    _startPolling();
+  }
+
+  // Start polling every 1 second
+  void _startPolling() {
+    _pollingTimer?.cancel(); // Cancel any existing timer
+    _pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      checkConnectionAndFetchData();
+    });
   }
 
   // Check connection and fetch data
   Future<void> checkConnectionAndFetchData() async {
+    if (_isLoading) return; // Skip if already loading
+
     _isLoading = true;
     _lastError = null;
     notifyListeners();
@@ -64,5 +77,12 @@ class HardwareProvider with ChangeNotifier {
   // Refresh data manually
   Future<void> refresh() async {
     await checkConnectionAndFetchData();
+  }
+
+  // Cancel the timer when the provider is disposed
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
   }
 }
