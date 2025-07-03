@@ -68,8 +68,10 @@ class HardwareService {
   // Send calorie comparison result to hardware
   static Future<bool> sendCalorieStatus(String status) async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/trig?status=$status'),
+      final response = await http.post(
+        Uri.parse('$_baseUrl/trig'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'status': status}),
       ).timeout(_timeout);
       
       return response.statusCode == 200;
