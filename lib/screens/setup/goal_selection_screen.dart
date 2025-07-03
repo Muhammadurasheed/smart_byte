@@ -46,24 +46,26 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
     try {
       // Update user provider with selected goal
       context.read<UserProvider>().updateUserInfo(goal: _selectedGoal);
-      context.read<UserProvider>().completeSetup();
+      // Complete setup and save data
+      context.read<UserProvider>().completeSetup().then((_) {
+        // Navigate to home dashboard with fade transition
+        Navigator.pushAndRemoveUntil(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const HomeDashboard(),
+            transitionDuration: const Duration(milliseconds: 300),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
+          (route) => false,
+        );
+      });
       
-      // Navigate to home dashboard with fade transition
-      Navigator.pushAndRemoveUntil(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HomeDashboard(),
-          transitionDuration: const Duration(milliseconds: 300),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-        (route) => false,
-      );
     } catch (e) {
       // Handle any errors during navigation or provider updates
       if (mounted) {

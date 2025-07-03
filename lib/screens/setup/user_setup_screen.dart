@@ -159,6 +159,26 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
               
               const SizedBox(height: AppSizes.paddingL),
               
+              // Daily Calorie Limit field
+              _buildInputField(
+                label: 'Daily Calorie Limit',
+                controller: _maxCalorieController,
+                icon: Icons.local_fire_department,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your daily calorie limit';
+                  }
+                  final maxCalorie = double.tryParse(value);
+                  if (maxCalorie == null || maxCalorie < 500 || maxCalorie > 5000) {
+                    return 'Enter a valid calorie limit (500-5000)';
+                  }
+                  return null;
+                },
+              ),
+              
+              const SizedBox(height: AppSizes.paddingL),
+              
               Row(
                 children: [
                   Expanded(
@@ -206,7 +226,9 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
               GradientButton(
                 text: 'Continue',
                 onPressed: () {
-                  if (_formKey.currentState!.validate() && _selectedGender.isNotEmpty) {
+                  if (_formKey.currentState!.validate() && 
+                      _selectedGender.isNotEmpty && 
+                      _maxCalorieController.text.isNotEmpty) {
                     // Update user provider
                     context.read<UserProvider>().updateUserInfo(
                       name: _nameController.text,
@@ -214,6 +236,7 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
                       age: int.parse(_ageController.text),
                       height: double.parse(_heightController.text),
                       weight: double.parse(_weightController.text),
+                      maxCalorie: double.parse(_maxCalorieController.text),
                     );
                     
                     Navigator.push(
@@ -235,6 +258,10 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
                   } else if (_selectedGender.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please select your gender')),
+                    );
+                  } else if (_maxCalorieController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter your daily calorie limit')),
                     );
                   }
                 },

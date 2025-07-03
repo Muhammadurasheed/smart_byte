@@ -4,11 +4,26 @@ import 'package:provider/provider.dart';
 import '../../utils/app_theme.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/meal_provider.dart';
+import '../../providers/hardware_provider.dart';
 import '../../widgets/navigation_wrapper.dart';
 import '../meal/meal_logging_screen.dart';
 
-class HomeDashboard extends StatelessWidget {
+class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
+
+  @override
+  State<HomeDashboard> createState() => _HomeDashboardState();
+}
+
+class _HomeDashboardState extends State<HomeDashboard> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize hardware connection when dashboard loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HardwareProvider>().initialize();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +304,9 @@ class HomeDashboard extends StatelessWidget {
                   Expanded(
                     child: _buildSpoonMetric(
                       'Max Calorie', 
-                      '${userProvider.maxCalorie.toInt()}',
+                      userProvider.maxCalorie > 0 
+                          ? '${userProvider.maxCalorie.toInt()}'
+                          : '0',
                       'kcal',
                       Icons.flag,
                       true, // Always show this as it's user data
@@ -336,7 +353,7 @@ class HomeDashboard extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: isConnected ? value : '--',
+                text: isConnected ? value : '0',
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

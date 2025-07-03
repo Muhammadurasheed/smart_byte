@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier {
   String _name = '';
@@ -19,6 +20,33 @@ class UserProvider with ChangeNotifier {
   double get maxCalorie => _maxCalorie;
   bool get isSetupComplete => _isSetupComplete;
 
+  // Load user data from secure storage
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    _name = prefs.getString('user_name') ?? '';
+    _gender = prefs.getString('user_gender') ?? '';
+    _age = prefs.getInt('user_age') ?? 0;
+    _height = prefs.getDouble('user_height') ?? 0.0;
+    _weight = prefs.getDouble('user_weight') ?? 0.0;
+    _goal = prefs.getString('user_goal') ?? '';
+    _maxCalorie = prefs.getDouble('user_max_calorie') ?? 0.0;
+    _isSetupComplete = prefs.getBool('setup_complete') ?? false;
+    notifyListeners();
+  }
+
+  // Save user data to secure storage
+  Future<void> saveUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', _name);
+    await prefs.setString('user_gender', _gender);
+    await prefs.setInt('user_age', _age);
+    await prefs.setDouble('user_height', _height);
+    await prefs.setDouble('user_weight', _weight);
+    await prefs.setString('user_goal', _goal);
+    await prefs.setDouble('user_max_calorie', _maxCalorie);
+    await prefs.setBool('setup_complete', _isSetupComplete);
+  }
+
   void updateUserInfo({
     String? name,
     String? gender,
@@ -36,10 +64,12 @@ class UserProvider with ChangeNotifier {
     if (goal != null) _goal = goal;
     if (maxCalorie != null) _maxCalorie = maxCalorie;
     notifyListeners();
+    saveUserData(); // Auto-save when data updates
   }
 
-  void completeSetup() {
+  Future<void> completeSetup() async {
     _isSetupComplete = true;
+    await saveUserData();
     notifyListeners();
   }
 
