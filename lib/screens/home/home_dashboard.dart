@@ -131,101 +131,228 @@ class HomeDashboard extends StatelessWidget {
   }
 
   Widget _buildSmartSpoonSummary(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.paddingL),
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(AppSizes.radiusL),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSizes.paddingS),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusS),
-                ),
-                child: const Icon(
-                  Icons.restaurant_menu,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: AppSizes.paddingS),
-              Text(
-                'Smart Spoon Summary',
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-             
-            ],
-          ),
-          const SizedBox(height: AppSizes.paddingL),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSpoonMetric('Total Bites', '220g', Icons.scale),
-              ),
-              const SizedBox(width: AppSizes.paddingM),
-              Expanded(
-                child: _buildSpoonMetric('Eating Speed', '26.7 g/min', Icons.speed),
+    return Consumer2<HardwareProvider, UserProvider>(
+      builder: (context, hardwareProvider, userProvider, child) {
+        final hardwareData = hardwareProvider.hardwareData;
+        final isConnected = hardwareProvider.isConnected;
+        final isLoading = hardwareProvider.isLoading;
+        
+        // Send calorie comparison when data updates
+        if (isConnected && hardwareData.calorie > 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            hardwareProvider.sendCalorieComparison(
+              hardwareData.calorie, 
+              userProvider.maxCalorie
+            );
+          });
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(AppSizes.paddingL),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(AppSizes.radiusL),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          const SizedBox(height: AppSizes.paddingM),
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _buildSpoonMetric('Meal Duration', '12 min', Icons.timer),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSizes.paddingS),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                    ),
+                    child: const Icon(
+                      Icons.restaurant_menu,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.paddingS),
+                  Expanded(
+                    child: Text(
+                      'Smart Spoon Summary',
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  // Connection status indicator
+                  if (!isConnected && !isLoading)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSizes.paddingS,
+                        vertical: AppSizes.paddingXS,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.wifi_off,
+                            color: Colors.orange.shade100,
+                            size: 14,
+                          ),
+                          const SizedBox(width: AppSizes.paddingXS),
+                          Text(
+                            'Offline',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: Colors.orange.shade100,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  // Refresh button
+                  const SizedBox(width: AppSizes.paddingS),
+                  GestureDetector(
+                    onTap: isLoading ? null : () => hardwareProvider.refresh(),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSizes.paddingS),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                      ),
+                      child: isLoading
+                          ? SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white.withOpacity(0.8),
+                                ),
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Icon(
+                              Icons.refresh,
+                              color: Colors.white.withOpacity(0.8),
+                              size: 16,
+                            ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: AppSizes.paddingM),
-              Expanded(
-                child: _buildSpoonMetric('Last Bite', '2 min ago', Icons.update),
+              const SizedBox(height: AppSizes.paddingL),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildSpoonMetric(
+                      'Calorie', 
+                      '${hardwareData.calorie.toInt()}',
+                      'kcal',
+                      Icons.local_fire_department,
+                      isConnected,
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.paddingM),
+                  Expanded(
+                    child: _buildSpoonMetric(
+                      'Calorie/min', 
+                      hardwareData.eatingSpeed.toStringAsFixed(1),
+                      'cal/min',
+                      Icons.speed,
+                      isConnected,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSizes.paddingM),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildSpoonMetric(
+                      'Meal Duration', 
+                      '${hardwareData.mealDuration.toInt()}',
+                      'min',
+                      Icons.timer,
+                      isConnected,
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.paddingM),
+                  Expanded(
+                    child: _buildSpoonMetric(
+                      'Max Calorie', 
+                      '${userProvider.maxCalorie.toInt()}',
+                      'kcal',
+                      Icons.flag,
+                      true, // Always show this as it's user data
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildSpoonMetric(String label, String value, IconData icon) {
+  Widget _buildSpoonMetric(String label, String value, String unit, IconData icon, bool isConnected) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.white.withOpacity(0.8), size: 16),
+            Icon(
+              icon, 
+              color: isConnected 
+                  ? Colors.white.withOpacity(0.8) 
+                  : Colors.white.withOpacity(0.5), 
+              size: 16
+            ),
             const SizedBox(width: AppSizes.paddingXS),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: Colors.white.withOpacity(0.8),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: isConnected 
+                      ? Colors.white.withOpacity(0.8)
+                      : Colors.white.withOpacity(0.5),
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: AppSizes.paddingXS),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: isConnected ? value : '--',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isConnected ? Colors.white : Colors.white.withOpacity(0.6),
+                ),
+              ),
+              TextSpan(
+                text: ' $unit',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: isConnected 
+                      ? Colors.white.withOpacity(0.7)
+                      : Colors.white.withOpacity(0.4),
+                ),
+              ),
+            ],
           ),
         ),
       ],

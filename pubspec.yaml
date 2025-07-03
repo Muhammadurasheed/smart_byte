@@ -39,6 +39,7 @@ dependencies:
   smooth_page_indicator:
   animations: 
   flutter_staggered_animations:
+  http: ^1.4.0
 
 
 dev_dependencies:

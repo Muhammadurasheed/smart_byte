@@ -19,6 +19,7 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
   final _ageController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
+  final _maxCalorieController = TextEditingController();
   
   String _selectedGender = '';
   double _progress = 0.2;
@@ -29,6 +30,7 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
     _ageController.dispose();
     _heightController.dispose();
     _weightController.dispose();
+    _maxCalorieController.dispose();
     super.dispose();
   }
 
@@ -39,9 +41,10 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
     if (_ageController.text.isNotEmpty) filledFields++;
     if (_heightController.text.isNotEmpty) filledFields++;
     if (_weightController.text.isNotEmpty) filledFields++;
+    if (_maxCalorieController.text.isNotEmpty) filledFields++;
     
     setState(() {
-      _progress = 0.2 + (filledFields * 0.16);
+      _progress = 0.2 + (filledFields * 0.133);
     });
   }
 
@@ -304,6 +307,8 @@ class _UserSetupScreenState extends State<UserSetupScreen> {
         return 'Height in cm (100-250)';
       case 'Weight (kg)':
         return 'Weight in kg (30-300)';
+      case 'Daily Calorie Limit':
+        return 'Daily calorie limit (500-5000)';
       default:
         return '';
     }

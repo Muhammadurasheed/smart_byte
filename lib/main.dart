@@ -6,6 +6,7 @@ import 'screens/welcome_screen.dart';
 import 'utils/app_theme.dart';
 import 'providers/user_provider.dart';
 import 'providers/meal_provider.dart';
+import 'providers/hardware_provider.dart';
 
 void main() {
   runApp(const SmartByteApp());
@@ -27,6 +28,7 @@ class SmartByteApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => MealProvider()),
+        ChangeNotifierProvider(create: (_) => HardwareProvider()),
       ],
       child: MaterialApp(
         title: 'SmartByte',

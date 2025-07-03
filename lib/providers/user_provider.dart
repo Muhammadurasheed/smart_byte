@@ -7,6 +7,7 @@ class UserProvider with ChangeNotifier {
   double _height = 0.0;
   double _weight = 0.0;
   String _goal = '';
+  double _maxCalorie = 0.0;
   bool _isSetupComplete = false;
 
   String get name => _name;
@@ -15,6 +16,7 @@ class UserProvider with ChangeNotifier {
   double get height => _height;
   double get weight => _weight;
   String get goal => _goal;
+  double get maxCalorie => _maxCalorie;
   bool get isSetupComplete => _isSetupComplete;
 
   void updateUserInfo({
@@ -24,6 +26,7 @@ class UserProvider with ChangeNotifier {
     double? height,
     double? weight,
     String? goal,
+    double? maxCalorie,
   }) {
     if (name != null) _name = name;
     if (gender != null) _gender = gender;
@@ -31,6 +34,7 @@ class UserProvider with ChangeNotifier {
     if (height != null) _height = height;
     if (weight != null) _weight = weight;
     if (goal != null) _goal = goal;
+    if (maxCalorie != null) _maxCalorie = maxCalorie;
     notifyListeners();
   }
 
