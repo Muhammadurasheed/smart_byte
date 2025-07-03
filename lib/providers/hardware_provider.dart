@@ -7,14 +7,13 @@ class HardwareProvider with ChangeNotifier {
   bool _isConnected = false;
   bool _isLoading = false;
   String? _lastError;
-  Timer? _pollingTimer; // Timer for periodic polling
+  Timer? _pollingTimer;
 
   HardwareData get hardwareData => _hardwareData;
   bool get isConnected => _isConnected;
   bool get isLoading => _isLoading;
   String? get lastError => _lastError;
 
-  // Initialize hardware connection and start polling
   Future<void> initialize() async {
     await checkConnectionAndFetchData();
     _startPolling();
@@ -22,7 +21,7 @@ class HardwareProvider with ChangeNotifier {
 
   // Start polling every 1 second
   void _startPolling() {
-    _pollingTimer?.cancel(); // Cancel any existing timer
+    _pollingTimer?.cancel();
     _pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       checkConnectionAndFetchData();
     });
